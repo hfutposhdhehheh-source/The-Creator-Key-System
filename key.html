@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE CREATOR | GET KEY</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 20px #00ffcc;
+            text-align: center;
+            width: 350px;
+        }
+        h1 {
+            color: #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .key-box {
+            background: #111;
+            border: 1px dashed #555;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 18px;
+            color: #00ffcc;
+            min-height: 25px;
+        }
+        button {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00ccaa;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Creator</h1>
+        <p>กดปุ่มด้านล่างเพื่อรับ Access Key</p>
+        <div class="key-box" id="keyDisplay">--- คีย์ของคุณจะปรากฏที่นี่ ---</div>
+        <button onclick="getKey()">Get Key Now</button>
+    </div>
+
+    <script>
+        function getKey() {
+            const date = new Date();
+            // สร้างคีย์สมมติเบื้องต้น (เดี๋ยวเราค่อยเชื่อมระบบหมดอายุทีหลัง)
+            const randomKey = "TC-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+            document.getElementById('keyDisplay').innerText = randomKey;
+            alert("ก๊อปปี้คีย์นี้ไปใส่ในสคริปต์ได้เลย! (มีอายุ 24 ชม.)");
+        }
+    </script>
+</body>
+</html>
+
