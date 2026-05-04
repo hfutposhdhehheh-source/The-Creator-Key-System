@@ -3,80 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE CREATOR | GET KEY</title>
+    <title>THE CREATOR | SUPREME KEY SYSTEM</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #000;
+            color: #00ff00;
+            font-family: 'Orbitron', sans-serif;
             height: 100vh;
-            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
-        .container {
-            background: rgba(20, 20, 20, 0.95);
-            padding: 40px;
+
+        /* Matrix Background Canvas */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .main-card {
+            background: rgba(0, 15, 0, 0.9);
+            border: 2px solid #00ff00;
+            padding: 50px;
             border-radius: 20px;
-            border: 2px solid #00ffcc;
-            box-shadow: 0 0 20px #00ffcc;
+            box-shadow: 0 0 30px #00ff00, inset 0 0 15px rgba(0, 255, 0, 0.3);
             text-align: center;
-            width: 350px;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            backdrop-filter: blur(5px);
         }
+
         h1 {
-            color: #00ffcc;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff00;
+            letter-spacing: 4px;
         }
-        .key-box {
-            background: #111;
-            border: 1px dashed #555;
-            padding: 15px;
-            margin: 20px 0;
-            font-family: monospace;
-            font-size: 18px;
-            color: #00ffcc;
-            min-height: 25px;
-        }
-        button {
-            background: #00ffcc;
-            color: #000;
-            border: none;
-            padding: 12px 25px;
+
+        .sub-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            color: #008800;
+            margin-bottom: 40px;
             font-weight: bold;
-            border-radius: 5px;
+        }
+
+        .key-container {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
             cursor: pointer;
             transition: 0.3s;
-            width: 100%;
-            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
         }
-        button:hover {
-            background: #00ccaa;
-            box-shadow: 0 0 15px #00ffcc;
+
+        .key-container:hover {
+            background: rgba(0, 255, 0, 0.15);
+            transform: scale(1.02);
+        }
+
+        #keyDisplay {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .gen-btn {
+            width: 100%;
+            padding: 18px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.4s;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        .gen-btn:hover:not(:disabled) {
+            background: #fff;
+            box-shadow: 0 0 40px #fff;
+            transform: translateY(-3px);
+        }
+
+        .gen-btn:disabled {
+            background: #004400;
+            color: #008800;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .footer-info {
+            margin-top: 30px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+            color: #00aa00;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>The Creator</h1>
-        <p>กดปุ่มด้านล่างเพื่อรับ Access Key</p>
-        <div class="key-box" id="keyDisplay">--- คีย์ของคุณจะปรากฏที่นี่ ---</div>
-        <button onclick="getKey()">Get Key Now</button>
+
+    <canvas id="matrixCanvas"></canvas>
+
+    <div class="main-card">
+        <h1>THE CREATOR</h1>
+        <p class="sub-title">SECURE ACCESS MANAGEMENT v2.0</p>
+        
+        <div class="key-container" onclick="copyKey()">
+            <div style="font-size: 10px; color: #00ff00; margin-bottom: 5px;">YOUR GENERATED KEY:</div>
+            <div id="keyDisplay">WAITING FOR ACTION...</div>
+            <div id="clickHint" style="font-size: 8px; margin-top: 8px; display:none;">(CLICK TO COPY)</div>
+        </div>
+
+        <button class="gen-btn" id="genBtn" onclick="generateKey()">GENERATE KEY</button>
+        
+        <div class="footer-info">
+            <span>STATUS: <span class="pulse">ONLINE</span></span>
+            <span>PROTECTION: AES-256</span>
+            <span>TIME: 24H</span>
+        </div>
     </div>
 
     <script>
-        function getKey() {
-            const date = new Date();
-            // สร้างคีย์สมมติเบื้องต้น (เดี๋ยวเราค่อยเชื่อมระบบหมดอายุทีหลัง)
-            const randomKey = "TC-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-            document.getElementById('keyDisplay').innerText = randomKey;
-            alert("ก๊อปปี้คีย์นี้ไปใส่ในสคริปต์ได้เลย! (มีอายุ 24 ชม.)");
+        // --- ส่วนเชื่อมต่อ FIREBASE (ดึงจากลิงก์ที่บอสส่งมา) ---
+        const firebaseConfig = {
+            databaseURL: "https://thecreatorkey-32aaf-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // --- ระบบ Matrix Background ---
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        for (let i = 0; i < columns; i++) drops[i] = 1;
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0F0";
+            ctx.font = fontSize + "px Orbitron";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        // --- ระบบ Generate Key ---
+        async function generateKey() {
+            const btn = document.getElementById('genBtn');
+            const display = document.getElementById('keyDisplay');
+            
+            btn.disabled = true;
+            btn.innerText = "AUTHENTICATING...";
+
+            // สุ่มคีย์แบบโคตรเท่
+            const newKey = "CREATOR-" + Math.random().toString(36).substr(2, 5).toUpperCase() + "-" + Math.random().toString(36).substr(2, 5).toUpperCase();
+            const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
+
+            try {
+                await database.ref('keys/' + newKey).set({
+                    expires: expiryTime,
+                    status: "active",
+                    createdAt: new Date().toISOString()
+                });
+
+                display.innerText = newKey;
+                document.getElementById('clickHint').style.display = 'block';
+                btn.innerText = "ACCESS GRANTED";
+                
+                Swal.fire({
+                    title: 'SUCCESS!',
+                    text: 'คีย์ของคุณถูกบันทึกเข้าระบบแล้ว',
+                    icon: 'success',
+                    background: '#001500',
+                    color: '#00ff00',
+                    confirmButtonColor: '#00ff00',
+                    confirmButtonText: 'รับทราบ'
+                });
+
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'ERROR', text: error.message });
+                btn.disabled = false;
+                btn.innerText = "GENERATE KEY";
+            }
+        }
+
+        // --- ระบบก๊อปปี้ ---
+        function copyKey() {
+            const keyText = document.getElementById('keyDisplay').innerText;
+            if (keyText.includes("WAITING")) return;
+
+            navigator.clipboard.writeText(keyText);
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'COPIED TO CLIPBOARD',
+                showConfirmButton: false,
+                timer: 1500,
+                background: '#000',
+                color: '#00ff00'
+            });
         }
     </script>
 </body>
 </html>
+
 
