@@ -1,189 +1,408 @@
-<!DOCTYPE html><html lang="th">
+<!DOCTYPE html>
+<html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE CREATOR | GOD MODE</title><script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><style>
-body{margin:0;background:#000;color:#0f0;font-family:Orbitron,monospace;overflow:hidden}
-canvas{position:fixed;top:0;left:0;z-index:0;opacity:.25}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE CREATOR | SUPREME ACCESS HUB</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
 
-.container{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;height:100vh}
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
-.card{
- backdrop-filter:blur(15px);
- background:rgba(0,20,0,.85);
- border:2px solid #0f0;
- padding:40px;
- border-radius:25px;
- box-shadow:0 0 50px #0f0;
- width:420px;
- text-align:center;
-}
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #0f0; border-radius: 10px; }
 
-h1{letter-spacing:3px}
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'Orbitron', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
 
-#key{
- border:1px solid #0f0;
- padding:18px;
- margin:20px 0;
- font-size:18px;
- cursor:pointer;
- min-height:30px;
-}
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.25;
+        }
 
-button{
- width:100%;
- padding:16px;
- border:none;
- border-radius:10px;
- font-weight:bold;
- background:linear-gradient(90deg,#0f0,#0ff,#0f0);
- background-size:200%;
- animation:move 2s linear infinite;
- cursor:pointer;
-}
+        .container {
+            z-index: 2;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
 
-@keyframes move{to{background-position:200%}}
+        .card {
+            background: rgba(0, 15, 0, 0.85);
+            border: 2px solid #0f0;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.4), inset 0 0 20px rgba(0, 255, 0, 0.2);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            transform-style: preserve-3d;
+            transition: 0.5s;
+        }
 
-.bar{height:6px;background:#022;border-radius:10px;overflow:hidden}
-.fill{height:100%;width:0;background:#0f0;transition:.2s}
+        .card:hover {
+            transform: rotateY(5deg) rotateX(5deg);
+        }
 
-.logs{
- height:100px;
- overflow:auto;
- font-size:12px;
- text-align:left;
- border:1px solid #064;
- padding:10px;
- margin-top:15px;
-}
+        h1 {
+            font-size: 2.2rem;
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px #0f0;
+            margin-bottom: 5px;
+        }
 
-.toggle{margin-top:10px;font-size:12px;cursor:pointer}
+        .version {
+            font-size: 0.7rem;
+            color: #008800;
+            margin-bottom: 25px;
+            display: block;
+        }
 
-</style></head>
-<body><canvas id="bg"></canvas>
+        .key-display-box {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #0f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
 
-<div class="container">
-<div class="card">
-<h1>THE CREATOR</h1><div id="key">WAITING FOR SYSTEM...</div><div class="bar"><div class="fill" id="fill"></div></div><br><button onclick="generateKey()">GENERATE KEY</button>
+        .key-display-box:hover {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: #fff;
+        }
 
-<p>USERS: <span id="count">0</span></p>
-<p>EXPIRE: <span id="timer">--</span></p><div class="logs" id="logs"></div>
-<div class="toggle" onclick="toggleSound()">🔊 SOUND: ON</div>
-</div>
-</div><audio id="bgm" loop src="https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3"></audio> <audio id="clickSfx" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+        #keyLabel {
+            font-size: 0.6rem;
+            color: #0f0;
+            margin-bottom: 10px;
+            display: block;
+            text-transform: uppercase;
+        }
 
-<script>
+        #keyText {
+            font-size: 1.3rem;
+            color: #fff;
+            letter-spacing: 2px;
+            font-weight: bold;
+            min-height: 30px;
+        }
 
-// Firebase
-const firebaseConfig={databaseURL:"https://thecreatorkey-32aaf-default-rtdb.firebaseio.com/"};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+        .progress-bar-container {
+            height: 4px;
+            background: rgba(0, 50, 0, 0.5);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
 
-// Matrix
-function matrix(){
- const c=bg,ctx=c.getContext("2d");
- c.width=innerWidth; c.height=innerHeight;
- const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
- const drops=Array(Math.floor(c.width/20)).fill(1);
- setInterval(()=>{
-  ctx.fillStyle="rgba(0,0,0,0.07)";
-  ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle="#0f0";
-  ctx.font="16px monospace";
-  drops.forEach((y,i)=>{
-   const text=letters[Math.random()*letters.length|0];
-   ctx.fillText(text,i*20,y);
-   drops[i]=y>c.height?0:y+20;
-  });
- },40);
-}
-matrix();
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0f0, #fff);
+            box-shadow: 0 0 10px #0f0;
+            transition: width 0.1s linear;
+        }
 
-// logs
-function log(t){
- logs.innerHTML+="> "+t+"<br>";
- logs.scrollTop=logs.scrollHeight;
-}
+        .btn-gen {
+            width: 100%;
+            padding: 18px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
 
-// hacker text
-function hacker(text){
- let i=0;
- const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
- const inter=setInterval(()=>{
-  key.innerText=text.split("").map((c,idx)=> idx<i?text[idx]:chars[Math.random()*chars.length|0]).join("");
-  if(i>=text.length) clearInterval(inter);
-  i+=0.4;
- },25);
-}
+        .btn-gen:hover:not(:disabled) {
+            background: #fff;
+            box-shadow: 0 0 30px #fff;
+            transform: scale(1.02);
+        }
 
-// countdown
-function countdown(exp){
- clearInterval(window.ct);
- window.ct=setInterval(()=>{
-  let d=exp-Date.now();
-  if(d<0){timer.innerText="EXPIRED";return}
-  let h=Math.floor(d/3600000);
-  let m=Math.floor(d%3600000/60000);
-  let s=Math.floor(d%60000/1000);
-  timer.innerText=`${h}h ${m}m ${s}s`;
- },1000);
-}
+        .btn-gen:disabled {
+            background: #003300;
+            color: #006600;
+            cursor: not-allowed;
+        }
 
-// sound toggle
-let soundOn=true;
-function toggleSound(){
- soundOn=!soundOn;
- document.querySelector(".toggle").innerText="🔊 SOUND: "+(soundOn?"ON":"OFF");
- if(soundOn) bgm.play(); else bgm.pause();
-}
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+        }
 
-bgm.volume=0.3;
-bgm.play();
+        .stat-item {
+            background: rgba(0, 255, 0, 0.03);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
 
-// anti spam
-let last=0;
+        .logs-window {
+            height: 80px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #042;
+            margin-top: 20px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.65rem;
+            color: #0a0;
+            overflow-y: auto;
+            text-align: left;
+        }
 
-async function generateKey(){
- if(Date.now()-last<3000) return Swal.fire("ช้าหน่อย");
- last=Date.now();
+        .sound-control {
+            margin-top: 15px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
 
- if(soundOn) clickSfx.play();
- navigator.vibrate?.(100);
+        .sound-control:hover { opacity: 1; }
 
- fill.style.width="0%";
- let p=0;
- let prog=setInterval(()=>{
-  p+=10;
-  fill.style.width=p+"%";
- },80);
+        .pulse { animation: p 1.5s infinite; }
+        @keyframes p { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    </style>
+</head>
+<body>
 
- log("INITIALIZING...");
- log("BYPASSING FIREWALL...");
- log("ACCESSING DATABASE...");
+    <canvas id="matrixBg"></canvas>
 
- const keyVal="CREATOR-"+Math.random().toString(36).slice(2,7).toUpperCase()+"-"+Math.random().toString(36).slice(2,7).toUpperCase();
- const exp=Date.now()+86400000;
+    <div class="container">
+        <div class="card">
+            <h1>THE CREATOR</h1>
+            <span class="version">SUPREME ACCESS v2.5 [GOLDEN-EDITION]</span>
 
- await db.ref("keys/"+keyVal).set({exp,status:"active"});
- db.ref("stats").transaction(v=>(v||0)+1);
+            <div class="key-display-box" onclick="copyToClipboard()">
+                <span id="keyLabel">Waiting for authentication...</span>
+                <div id="keyText">XXXXX-XXXXX-XXXXX</div>
+            </div>
 
- setTimeout(()=>{
-  clearInterval(prog);
-  hacker(keyVal);
-  countdown(exp);
-  log("ACCESS GRANTED");
-  Swal.fire({icon:"success",title:"KEY GENERATED"});
- },1200);
-}
+            <div class="progress-bar-container">
+                <div class="progress-fill" id="pFill"></div>
+            </div>
 
-// realtime count
-db.ref("stats").on("value",s=>count.innerText=s.val()||0);
+            <button class="btn-gen" id="genBtn" onclick="processKey()">GENERATE ACCESS KEY</button>
 
-// copy
-key.onclick=()=>{
- navigator.clipboard.writeText(key.innerText);
- Swal.fire({toast:true,position:"top-end",title:"Copied",showConfirmButton:false,timer:1000});
-}
+            <div class="logs-window" id="logBox"></div>
 
-</script></body>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div>SERVER STATUS</div>
+                    <div style="color:#fff;" class="pulse">ENCRYPTED</div>
+                </div>
+                <div class="stat-item">
+                    <div>ACTIVE USERS</div>
+                    <div style="color:#fff;" id="userCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <div>EXPIRATION</div>
+                    <div style="color:#fff;" id="timerDisplay">24:00:00</div>
+                </div>
+                <div class="stat-item">
+                    <div>SECURITY</div>
+                    <div style="color:#fff;">AES-256</div>
+                </div>
+            </div>
+
+            <div class="sound-control" onclick="toggleAudio()">🔊 AUDIO: ON</div>
+        </div>
+    </div>
+
+    <audio id="bgm" loop src="https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3"></audio>
+    <audio id="sfxClick" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+    <script>
+        // --- CONFIGURATION ---
+        const firebaseConfig = { databaseURL: "https://thecreatorkey-32aaf-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let isAudioOn = true;
+        let lastGenTime = 0;
+        const BGM = document.getElementById('bgm');
+        const SFX = document.getElementById('sfxClick');
+        BGM.volume = 0.2;
+
+        // --- MATRIX BACKGROUND ---
+        function initMatrix() {
+            const c = document.getElementById('matrixBg');
+            const ctx = c.getContext('2d');
+            c.width = window.innerWidth;
+            c.height = window.innerHeight;
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%";
+            const fontSize = 16;
+            const columns = c.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, c.width, c.height);
+                ctx.fillStyle = "#0f0";
+                ctx.font = fontSize + "px Orbitron";
+                drops.forEach((y, i) => {
+                    const char = letters[Math.floor(Math.random() * letters.length)];
+                    ctx.fillText(char, i * fontSize, y * fontSize);
+                    if (y * fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                });
+            }
+            setInterval(draw, 35);
+        }
+        initMatrix();
+
+        // --- CORE FUNCTIONS ---
+        function addLog(msg) {
+            const box = document.getElementById('logBox');
+            box.innerHTML += `> [${new Date().toLocaleTimeString()}] ${msg}<br>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function toggleAudio() {
+            isAudioOn = !isAudioOn;
+            document.querySelector('.sound-control').innerText = `🔊 AUDIO: ${isAudioOn ? 'ON' : 'OFF'}`;
+            if(isAudioOn) BGM.play(); else BGM.pause();
+        }
+
+        window.onclick = () => { if(isAudioOn && BGM.paused) BGM.play().catch(()=>{}); }
+
+        function hackerEffect(targetText) {
+            let i = 0;
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const display = document.getElementById('keyText');
+            const inter = setInterval(() => {
+                display.innerText = targetText.split("").map((c, idx) => 
+                    idx < Math.floor(i) ? targetText[idx] : chars[Math.floor(Math.random() * chars.length)]
+                ).join("");
+                if(i >= targetText.length) {
+                    clearInterval(inter);
+                    display.innerText = targetText;
+                }
+                i += 0.3;
+            }, 30);
+        }
+
+        function startCountdown(expiry) {
+            clearInterval(window.timerInt);
+            window.timerInt = setInterval(() => {
+                const diff = expiry - Date.now();
+                if(diff <= 0) {
+                    document.getElementById('timerDisplay').innerText = "EXPIRED";
+                    return;
+                }
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('timerDisplay').innerText = 
+                    `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        async function processKey() {
+            if(Date.now() - lastGenTime < 5000) {
+                Swal.fire({icon: 'warning', title: 'ANTI-SPAM', text: 'Please wait 5 seconds.', background: '#000', color: '#0f0'});
+                return;
+            }
+            lastGenTime = Date.now();
+            
+            const btn = document.getElementById('genBtn');
+            const fill = document.getElementById('pFill');
+            
+            if(isAudioOn) { SFX.currentTime = 0; SFX.play(); }
+            
+            btn.disabled = true;
+            btn.innerText = "AUTHENTICATING...";
+            
+            // Animation Progress
+            let p = 0;
+            const pInterval = setInterval(() => {
+                p += Math.random() * 5;
+                if(p > 100) p = 100;
+                fill.style.width = p + "%";
+            }, 50);
+
+            addLog("REQUESTING ACCESS...");
+            addLog("BYPASSING FIREWALL...");
+            
+            const newKey = "CREATOR-" + Math.random().toString(36).substr(2, 6).toUpperCase() + "-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+            const expTime = Date.now() + (24 * 60 * 60 * 1000); // 24 Hours
+
+            try {
+                await db.ref('keys/' + newKey).set({
+                    expires: expTime,
+                    status: "active",
+                    createdAt: new Date().toISOString()
+                });
+                db.ref('stats').transaction(v => (v || 0) + 1);
+
+                setTimeout(() => {
+                    clearInterval(pInterval);
+                    fill.style.width = "100%";
+                    hackerEffect(newKey);
+                    startCountdown(expTime);
+                    document.getElementById('keyLabel').innerText = "SYSTEM ACCESS GRANTED:";
+                    btn.innerText = "KEY GENERATED";
+                    addLog("DATABASE INJECTED SUCCESSFULLY.");
+                    addLog("ACCESS KEY: " + newKey);
+                    
+                    Swal.fire({
+                        title: 'ACCESS GRANTED',
+                        text: 'Your key has been registered for 24 hours.',
+                        icon: 'success',
+                        background: '#001500',
+                        color: '#0f0',
+                        confirmButtonColor: '#0f0'
+                    });
+                }, 1500);
+
+            } catch (e) {
+                addLog("ERROR: " + e.message);
+                btn.disabled = false;
+                btn.innerText = "RETRY GENERATE";
+            }
+        }
+
+        function copyToClipboard() {
+            const keyText = document.getElementById('keyText').innerText;
+            if(keyText.includes("XXXXX")) return;
+            navigator.clipboard.writeText(keyText);
+            Swal.fire({toast: true, position: 'top-end', title: 'COPIED!', showConfirmButton: false, timer: 1500, background: '#000', color: '#0f0'});
+        }
+
+        // Realtime stats
+        db.ref('stats').on('value', s => {
+            document.getElementById('userCount').innerText = s.val() || 0;
+        });
+    </script>
+</body>
 </html>
