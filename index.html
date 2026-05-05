@@ -1,256 +1,189 @@
-<!DOCTYPE html>
-<html lang="th">
+<!DOCTYPE html><html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE CREATOR | SUPREME KEY SYSTEM</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE CREATOR | GOD MODE</title><script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><style>
+body{margin:0;background:#000;color:#0f0;font-family:Orbitron,monospace;overflow:hidden}
+canvas{position:fixed;top:0;left:0;z-index:0;opacity:.25}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+.container{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;height:100vh}
 
-        body {
-            background: #000;
-            color: #00ff00;
-            font-family: 'Orbitron', sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
+.card{
+ backdrop-filter:blur(15px);
+ background:rgba(0,20,0,.85);
+ border:2px solid #0f0;
+ padding:40px;
+ border-radius:25px;
+ box-shadow:0 0 50px #0f0;
+ width:420px;
+ text-align:center;
+}
 
-        /* Matrix Background Canvas */
-        #matrixCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            opacity: 0.3;
-        }
+h1{letter-spacing:3px}
 
-        .main-card {
-            background: rgba(0, 15, 0, 0.9);
-            border: 2px solid #00ff00;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 0 30px #00ff00, inset 0 0 15px rgba(0, 255, 0, 0.3);
-            text-align: center;
-            width: 100%;
-            max-width: 450px;
-            position: relative;
-            backdrop-filter: blur(5px);
-        }
+#key{
+ border:1px solid #0f0;
+ padding:18px;
+ margin:20px 0;
+ font-size:18px;
+ cursor:pointer;
+ min-height:30px;
+}
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #00ff00;
-            letter-spacing: 4px;
-        }
+button{
+ width:100%;
+ padding:16px;
+ border:none;
+ border-radius:10px;
+ font-weight:bold;
+ background:linear-gradient(90deg,#0f0,#0ff,#0f0);
+ background-size:200%;
+ animation:move 2s linear infinite;
+ cursor:pointer;
+}
 
-        .sub-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem;
-            color: #008800;
-            margin-bottom: 40px;
-            font-weight: bold;
-        }
+@keyframes move{to{background-position:200%}}
 
-        .key-container {
-            background: rgba(0, 255, 0, 0.05);
-            border: 1px solid #00ff00;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
+.bar{height:6px;background:#022;border-radius:10px;overflow:hidden}
+.fill{height:100%;width:0;background:#0f0;transition:.2s}
 
-        .key-container:hover {
-            background: rgba(0, 255, 0, 0.15);
-            transform: scale(1.02);
-        }
+.logs{
+ height:100px;
+ overflow:auto;
+ font-size:12px;
+ text-align:left;
+ border:1px solid #064;
+ padding:10px;
+ margin-top:15px;
+}
 
-        #keyDisplay {
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 10px #00ff00;
-        }
+.toggle{margin-top:10px;font-size:12px;cursor:pointer}
 
-        .gen-btn {
-            width: 100%;
-            padding: 18px;
-            background: #00ff00;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: 0.4s;
-            box-shadow: 0 0 15px #00ff00;
-        }
+</style></head>
+<body><canvas id="bg"></canvas>
 
-        .gen-btn:hover:not(:disabled) {
-            background: #fff;
-            box-shadow: 0 0 40px #fff;
-            transform: translateY(-3px);
-        }
+<div class="container">
+<div class="card">
+<h1>THE CREATOR</h1><div id="key">WAITING FOR SYSTEM...</div><div class="bar"><div class="fill" id="fill"></div></div><br><button onclick="generateKey()">GENERATE KEY</button>
 
-        .gen-btn:disabled {
-            background: #004400;
-            color: #008800;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
+<p>USERS: <span id="count">0</span></p>
+<p>EXPIRE: <span id="timer">--</span></p><div class="logs" id="logs"></div>
+<div class="toggle" onclick="toggleSound()">🔊 SOUND: ON</div>
+</div>
+</div><audio id="bgm" loop src="https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3"></audio> <audio id="clickSfx" src="https://www.soundjay.com/button/beep-07.wav"></audio>
 
-        .footer-info {
-            margin-top: 30px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.8rem;
-            color: #00aa00;
-            display: flex;
-            justify-content: space-around;
-        }
+<script>
 
-        .pulse {
-            animation: pulse-animation 2s infinite;
-        }
+// Firebase
+const firebaseConfig={databaseURL:"https://thecreatorkey-32aaf-default-rtdb.firebaseio.com/"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
 
-        @keyframes pulse-animation {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-    </style>
-</head>
-<body>
+// Matrix
+function matrix(){
+ const c=bg,ctx=c.getContext("2d");
+ c.width=innerWidth; c.height=innerHeight;
+ const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+ const drops=Array(Math.floor(c.width/20)).fill(1);
+ setInterval(()=>{
+  ctx.fillStyle="rgba(0,0,0,0.07)";
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle="#0f0";
+  ctx.font="16px monospace";
+  drops.forEach((y,i)=>{
+   const text=letters[Math.random()*letters.length|0];
+   ctx.fillText(text,i*20,y);
+   drops[i]=y>c.height?0:y+20;
+  });
+ },40);
+}
+matrix();
 
-    <canvas id="matrixCanvas"></canvas>
+// logs
+function log(t){
+ logs.innerHTML+="> "+t+"<br>";
+ logs.scrollTop=logs.scrollHeight;
+}
 
-    <div class="main-card">
-        <h1>THE CREATOR</h1>
-        <p class="sub-title">SECURE ACCESS MANAGEMENT v2.0</p>
-        
-        <div class="key-container" onclick="copyKey()">
-            <div style="font-size: 10px; color: #00ff00; margin-bottom: 5px;">YOUR GENERATED KEY:</div>
-            <div id="keyDisplay">WAITING FOR ACTION...</div>
-            <div id="clickHint" style="font-size: 8px; margin-top: 8px; display:none;">(CLICK TO COPY)</div>
-        </div>
+// hacker text
+function hacker(text){
+ let i=0;
+ const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+ const inter=setInterval(()=>{
+  key.innerText=text.split("").map((c,idx)=> idx<i?text[idx]:chars[Math.random()*chars.length|0]).join("");
+  if(i>=text.length) clearInterval(inter);
+  i+=0.4;
+ },25);
+}
 
-        <button class="gen-btn" id="genBtn" onclick="generateKey()">GENERATE KEY</button>
-        
-        <div class="footer-info">
-            <span>STATUS: <span class="pulse">ONLINE</span></span>
-            <span>PROTECTION: AES-256</span>
-            <span>TIME: 24H</span>
-        </div>
-    </div>
+// countdown
+function countdown(exp){
+ clearInterval(window.ct);
+ window.ct=setInterval(()=>{
+  let d=exp-Date.now();
+  if(d<0){timer.innerText="EXPIRED";return}
+  let h=Math.floor(d/3600000);
+  let m=Math.floor(d%3600000/60000);
+  let s=Math.floor(d%60000/1000);
+  timer.innerText=`${h}h ${m}m ${s}s`;
+ },1000);
+}
 
-    <script>
-        // --- ส่วนเชื่อมต่อ FIREBASE (ดึงจากลิงก์ที่บอสส่งมา) ---
-        const firebaseConfig = {
-            databaseURL: "https://thecreatorkey-32aaf-default-rtdb.firebaseio.com/"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+// sound toggle
+let soundOn=true;
+function toggleSound(){
+ soundOn=!soundOn;
+ document.querySelector(".toggle").innerText="🔊 SOUND: "+(soundOn?"ON":"OFF");
+ if(soundOn) bgm.play(); else bgm.pause();
+}
 
-        // --- ระบบ Matrix Background ---
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-        const drops = [];
-        for (let i = 0; i < columns; i++) drops[i] = 1;
+bgm.volume=0.3;
+bgm.play();
 
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0F0";
-            ctx.font = fontSize + "px Orbitron";
-            for (let i = 0; i < drops.length; i++) {
-                const text = letters.charAt(Math.floor(Math.random() * letters.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            }
-        }
-        setInterval(drawMatrix, 33);
+// anti spam
+let last=0;
 
-        // --- ระบบ Generate Key ---
-        async function generateKey() {
-            const btn = document.getElementById('genBtn');
-            const display = document.getElementById('keyDisplay');
-            
-            btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
+async function generateKey(){
+ if(Date.now()-last<3000) return Swal.fire("ช้าหน่อย");
+ last=Date.now();
 
-            // สุ่มคีย์แบบโคตรเท่
-            const newKey = "CREATOR-" + Math.random().toString(36).substr(2, 5).toUpperCase() + "-" + Math.random().toString(36).substr(2, 5).toUpperCase();
-            const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
+ if(soundOn) clickSfx.play();
+ navigator.vibrate?.(100);
 
-            try {
-                await database.ref('keys/' + newKey).set({
-                    expires: expiryTime,
-                    status: "active",
-                    createdAt: new Date().toISOString()
-                });
+ fill.style.width="0%";
+ let p=0;
+ let prog=setInterval(()=>{
+  p+=10;
+  fill.style.width=p+"%";
+ },80);
 
-                display.innerText = newKey;
-                document.getElementById('clickHint').style.display = 'block';
-                btn.innerText = "ACCESS GRANTED";
-                
-                Swal.fire({
-                    title: 'SUCCESS!',
-                    text: 'คีย์ของคุณถูกบันทึกเข้าระบบแล้ว',
-                    icon: 'success',
-                    background: '#001500',
-                    color: '#00ff00',
-                    confirmButtonColor: '#00ff00',
-                    confirmButtonText: 'รับทราบ'
-                });
+ log("INITIALIZING...");
+ log("BYPASSING FIREWALL...");
+ log("ACCESSING DATABASE...");
 
-            } catch (error) {
-                Swal.fire({ icon: 'error', title: 'ERROR', text: error.message });
-                btn.disabled = false;
-                btn.innerText = "GENERATE KEY";
-            }
-        }
+ const keyVal="CREATOR-"+Math.random().toString(36).slice(2,7).toUpperCase()+"-"+Math.random().toString(36).slice(2,7).toUpperCase();
+ const exp=Date.now()+86400000;
 
-        // --- ระบบก๊อปปี้ ---
-        function copyKey() {
-            const keyText = document.getElementById('keyDisplay').innerText;
-            if (keyText.includes("WAITING")) return;
+ await db.ref("keys/"+keyVal).set({exp,status:"active"});
+ db.ref("stats").transaction(v=>(v||0)+1);
 
-            navigator.clipboard.writeText(keyText);
-            
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'success',
-                title: 'COPIED TO CLIPBOARD',
-                showConfirmButton: false,
-                timer: 1500,
-                background: '#000',
-                color: '#00ff00'
-            });
-        }
-    </script>
-</body>
+ setTimeout(()=>{
+  clearInterval(prog);
+  hacker(keyVal);
+  countdown(exp);
+  log("ACCESS GRANTED");
+  Swal.fire({icon:"success",title:"KEY GENERATED"});
+ },1200);
+}
+
+// realtime count
+db.ref("stats").on("value",s=>count.innerText=s.val()||0);
+
+// copy
+key.onclick=()=>{
+ navigator.clipboard.writeText(key.innerText);
+ Swal.fire({toast:true,position:"top-end",title:"Copied",showConfirmButton:false,timer:1000});
+}
+
+</script></body>
 </html>
-
-
