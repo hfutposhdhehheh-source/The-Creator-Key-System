@@ -10,23 +10,21 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Rajdhani:wght@500;700&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #0f0; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #00ff66; border-radius: 10px; box-shadow: 0 0 10px #00ff66; }
 
         body {
-            background: #000;
-            color: #0f0;
+            background: #020604;
+            color: #00ff66;
             font-family: 'Orbitron', sans-serif;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            perspective: 1000px;
         }
 
         canvas {
@@ -34,164 +32,215 @@
             top: 0;
             left: 0;
             z-index: -1;
-            opacity: 0.25;
+            opacity: 0.15;
         }
 
         .container {
             z-index: 2;
             width: 100%;
-            max-width: 450px;
+            max-width: 460px;
             padding: 20px;
         }
 
+        /* เมนการ์ดทรง Sci-Fi ตัดมุมล้ำๆ (Cyber Panel) */
         .card {
-            background: rgba(0, 15, 0, 0.85);
-            border: 2px solid #0f0;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.4), inset 0 0 20px rgba(0, 255, 0, 0.2);
-            backdrop-filter: blur(20px);
+            background: rgba(4, 14, 8, 0.85);
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            padding: 40px 30px;
+            border-radius: 4px;
+            /* ตัดมุมซ้ายบนและขวาล่างให้เป็นเหลี่ยมเหล็กยานอวกาศ */
+            clip-path: polygon(40px 0%, 100% 0%, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0% 100%, 0% 40px);
+            box-shadow: 0 0 40px rgba(0, 255, 102, 0.15), inset 0 0 25px rgba(0, 255, 102, 0.05);
+            backdrop-filter: blur(25px);
             text-align: center;
-            transform-style: preserve-3d;
-            transition: 0.5s;
+            position: relative;
         }
 
-        .card:hover {
-            transform: rotateY(5deg) rotateX(5deg);
+        /* เส้นนีออนประดับมุมกล่องเพิ่มความแพง */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 40px; right: 0; height: 2px;
+            background: linear-gradient(90deg, #00ff66, transparent);
+            box-shadow: 0 0 10px #00ff66;
         }
 
         h1 {
-            font-size: 2.2rem;
-            letter-spacing: 5px;
-            text-shadow: 0 0 15px #0f0;
-            margin-bottom: 5px;
+            font-size: 2.3rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 0.8), 0 0 30px rgba(0, 255, 102, 0.4);
+            margin-bottom: 2px;
         }
 
         .version {
-            font-size: 0.7rem;
-            color: #008800;
+            font-size: 0.65rem;
+            color: #00aa44;
+            letter-spacing: 2px;
             margin-bottom: 25px;
             display: block;
         }
 
-        .key-display-box {
-            background: rgba(0, 255, 0, 0.05);
-            border: 1px solid #0f0;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
+        /* แถบบอกความคืบหน้าของด่าน (Step Track Lines) */
+        .step-track {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 10px;
         }
-
-        .key-display-box:hover {
-            background: rgba(0, 255, 0, 0.1);
+        .track-dot {
+            width: 30%; height: 4px;
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            border-radius: 2px;
+            transition: all 0.5s ease;
+        }
+        .track-dot.filled {
+            background: #00ff66;
+            box-shadow: 0 0 10px #00ff66;
             border-color: #fff;
         }
 
-        #keyLabel {
-            font-size: 0.6rem;
-            color: #0f0;
-            margin-bottom: 10px;
-            display: block;
+        .step-indicator {
+            font-size: 0.75rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
             text-transform: uppercase;
         }
 
-        #keyText {
-            font-size: 1.3rem;
+        .step-content { display: none; }
+        .step-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-field {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #00ff66;
+            padding: 15px;
             color: #fff;
-            letter-spacing: 2px;
-            font-weight: bold;
-            min-height: 30px;
-        }
-
-        .progress-bar-container {
-            height: 4px;
-            background: rgba(0, 50, 0, 0.5);
-            border-radius: 10px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #0f0, #fff);
-            box-shadow: 0 0 10px #0f0;
-            transition: width 0.1s linear;
-        }
-
-        .btn-gen {
-            width: 100%;
-            padding: 18px;
-            background: #0f0;
-            color: #000;
-            border: none;
-            border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.1rem;
-            cursor: pointer;
+            font-size: 1.3rem;
+            border-radius: 6px;
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: inset 0 0 15px rgba(0,255,102,0.15);
             transition: 0.3s;
+        }
+        .input-field:focus { box-shadow: 0 0 15px rgba(0,255,102,0.4), inset 0 0 10px rgba(0,255,102,0.2); border-color: #fff; }
+
+        .captcha-box {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            margin: 10px 0;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 0.8);
+            background: rgba(0, 255, 102, 0.03);
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #00ff66;
+        }
+
+        /* วงแหวนเรดาร์เรืองแสงด่าน 2 */
+        .radar-container {
             position: relative;
+            width: 130px; height: 130px;
+            margin: 25px auto;
+        }
+        .radar-circle {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: 2px dashed rgba(0, 255, 102, 0.4);
+            border-radius: 50%;
+            animation: rotateRadar 10s linear infinite;
+        }
+        .radar-circle-inner {
+            position: absolute;
+            top: 15px; left: 15px; width: 100px; height: 100px;
+            border: 2px solid rgba(0, 255, 102, 0.2);
+            border-top: 2px solid #00ff66;
+            border-radius: 50%;
+            animation: rotateRadarReverse 3s linear infinite;
+        }
+        .cooldown-box {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem; font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px #00ff66;
+        }
+        @keyframes rotateRadar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotateRadarReverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        /* กล่องโชว์คีย์แบบ Hologram */
+        .key-display-box {
+            background: rgba(0, 255, 102, 0.02);
+            border: 1px solid rgba(0, 255, 102, 0.3);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
             overflow: hidden;
         }
+        .key-display-box::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,102,0.15), transparent);
+            transition: 0.5s;
+        }
+        .key-display-box:hover::before { left: 150%; }
+        .key-display-box:hover { background: rgba(0, 255, 102, 0.05); border-color: #00ff66; box-shadow: 0 0 20px rgba(0,255,102,0.2); }
 
+        #keyLabel { font-size: 0.6rem; color: #00aa44; margin-bottom: 10px; display: block; letter-spacing: 2px; }
+        #keyText { font-size: 1.35rem; color: #fff; letter-spacing: 2px; font-weight: 900; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+
+        .progress-bar-container { height: 4px; background: rgba(0, 40, 15, 0.6); border-radius: 2px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff66, #fff); box-shadow: 0 0 8px #00ff66; }
+
+        /* ปุ่มแนว Sci-Fi สุดเดือด */
+        .btn-gen {
+            width: 100%; padding: 16px;
+            background: transparent;
+            color: #00ff66;
+            border: 1px solid #00ff66;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-size: 1rem; letter-spacing: 2px;
+            cursor: pointer; position: relative; transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.1);
+        }
         .btn-gen:hover:not(:disabled) {
-            background: #fff;
-            box-shadow: 0 0 30px #fff;
-            transform: scale(1.02);
+            background: #00ff66; color: #000;
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.6);
+            text-shadow: none;
         }
+        .btn-gen:disabled { background: rgba(0, 30, 10, 0.3); border-color: rgba(0, 255, 102, 0.1); color: #004411; cursor: not-allowed; box-shadow: none; }
 
-        .btn-gen:disabled {
-            background: #003300;
-            color: #006600;
-            cursor: not-allowed;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 0.8rem;
-        }
-
-        .stat-item {
-            background: rgba(0, 255, 0, 0.03);
-            border: 1px solid rgba(0, 255, 0, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
+        /* ส่วนล่าง หน้าต่างล็อก และ สแตท */
         .logs-window {
-            height: 80px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #042;
-            margin-top: 20px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 0.65rem;
-            color: #0a0;
-            overflow-y: auto;
-            text-align: left;
+            height: 75px; background: rgba(0, 4, 2, 0.8);
+            border: 1px solid rgba(0, 255, 102, 0.15);
+            margin-top: 20px; padding: 10px;
+            font-family: monospace; font-size: 0.65rem; color: #00cc55;
+            overflow-y: auto; text-align: left; border-radius: 4px;
         }
 
-        .sound-control {
-            margin-top: 15px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            opacity: 0.6;
-            transition: 0.3s;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; font-family: 'Rajdhani', sans-serif; font-size: 0.8rem; }
+        .stat-item { background: rgba(0, 255, 102, 0.01); border: 1px solid rgba(0, 255, 102, 0.1); padding: 8px 12px; border-radius: 4px; display: flex; justify-content: space-between; }
+        .stat-label { color: #008833; }
 
-        .sound-control:hover { opacity: 1; }
+        .sound-control { margin-top: 15px; font-size: 0.65rem; cursor: pointer; opacity: 0.5; transition: 0.3s; letter-spacing: 1px; }
+        .sound-control:hover { opacity: 1; color: #fff; }
 
         .pulse { animation: p 1.5s infinite; }
-        @keyframes p { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes p { 0%, 100% { opacity: 1; text-shadow: 0 0 8px #00ff66; } 50% { opacity: 0.4; } }
     </style>
 </head>
 <body>
@@ -201,41 +250,66 @@
     <div class="container">
         <div class="card">
             <h1>THE CREATOR</h1>
-            <span class="version">SUPREME ACCESS v2.5 [GOLDEN-EDITION]</span>
+            <span class="version">SUPREME ACCESS SYSTEM v2.5</span>
 
-            <div class="key-display-box" onclick="copyToClipboard()">
-                <span id="keyLabel">Waiting for authentication...</span>
-                <div id="keyText">XXXXX-XXXXX-XXXXX</div>
+            <div class="step-track">
+                <div class="track-dot filled" id="dot1"></div>
+                <div class="track-dot" id="dot2"></div>
+                <div class="track-dot" id="dot3"></div>
             </div>
 
-            <div class="progress-bar-container">
-                <div class="progress-fill" id="pFill"></div>
+            <div class="step-indicator" id="stepTitle">PHASE 01: HUMAN IDENTITY OVERRIDE</div>
+
+            <div class="step-content active" id="step1">
+                <div class="captcha-box" id="captchaQuestion">0 + 0 = ?</div>
+                <input type="number" id="captchaAnswer" class="input-field" placeholder="ENTER COGNITIVE CODE">
+                <button class="btn-gen" onclick="verifyStep1()">INITIALIZE VERIFICATION</button>
             </div>
 
-            <button class="btn-gen" id="genBtn" onclick="processKey()">GENERATE ACCESS KEY</button>
+            <div class="step-content" id="step2">
+                <div class="radar-container">
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle-inner"></div>
+                    <div class="cooldown-box" id="cooldownSeconds">10</div>
+                </div>
+                <button class="btn-gen" id="step2Btn" onclick="goToStep3()" disabled>DECRYPTING MAIN FRAME...</button>
+            </div>
+
+            <div class="step-content" id="step3">
+                <div class="key-display-box" onclick="copyToClipboard()">
+                    <span id="keyLabel">SECURE ACCESS TOKEN STATUS:</span>
+                    <div id="keyText">XXXXX-XXXXX-XXXXX</div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-fill" id="pFill"></div>
+                </div>
+
+                <button class="btn-gen" id="genBtn" onclick="processKey()">EXECUTE ACCESS INJECTION</button>
+            </div>
 
             <div class="logs-window" id="logBox"></div>
 
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div>SERVER STATUS</div>
-                    <div style="color:#fff;" class="pulse">ENCRYPTED</div>
+                    <span class="stat-label">FIREWALL</span>
+                    <span style="color:#fff;" class="pulse">ENCRYPTED</span>
                 </div>
                 <div class="stat-item">
-                    <div>ACTIVE USERS</div>
-                    <div style="color:#fff;" id="userCount">0</div>
+                    <span class="stat-label">NODES</span>
+                    <span style="color:#fff;" id="userCount">0</span>
                 </div>
                 <div class="stat-item">
-                    <div>EXPIRATION</div>
-                    <div style="color:#fff;" id="timerDisplay">24:00:00</div>
+                    <span class="stat-label">LIFETIME</span>
+                    <span style="color:#fff;" id="timerDisplay">24:00:00</span>
                 </div>
                 <div class="stat-item">
-                    <div>SECURITY</div>
-                    <div style="color:#fff;">AES-256</div>
+                    <span class="stat-label">CIPHER</span>
+                    <span style="color:#fff;">AES-256</span>
                 </div>
             </div>
 
-            <div class="sound-control" onclick="toggleAudio()">🔊 AUDIO: ON</div>
+            <div class="sound-control" onclick="toggleAudio()">🔊 AUDIO SYSTEM: ACTIVE</div>
         </div>
     </div>
 
@@ -266,9 +340,9 @@
             const drops = Array(Math.floor(columns)).fill(1);
 
             function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillStyle = "rgba(2, 6, 4, 0.06)";
                 ctx.fillRect(0, 0, c.width, c.height);
-                ctx.fillStyle = "#0f0";
+                ctx.fillStyle = "rgba(0, 255, 102, 0.6)";
                 ctx.font = fontSize + "px Orbitron";
                 drops.forEach((y, i) => {
                     const char = letters[Math.floor(Math.random() * letters.length)];
@@ -281,7 +355,7 @@
         }
         initMatrix();
 
-        // --- CORE FUNCTIONS ---
+        // --- CORE LOGIC ---
         function addLog(msg) {
             const box = document.getElementById('logBox');
             box.innerHTML += `> [${new Date().toLocaleTimeString()}] ${msg}<br>`;
@@ -290,15 +364,79 @@
 
         function toggleAudio() {
             isAudioOn = !isAudioOn;
-            document.querySelector('.sound-control').innerText = `🔊 AUDIO: ${isAudioOn ? 'ON' : 'OFF'}`;
+            document.querySelector('.sound-control').innerText = `🔊 AUDIO SYSTEM: ${isAudioOn ? 'ACTIVE' : 'MUTED'}`;
             if(isAudioOn) BGM.play(); else BGM.pause();
+        }
+
+        function playClickSound() {
+            if(isAudioOn) { SFX.currentTime = 0; SFX.play().catch(()=>{}); }
         }
 
         window.onclick = () => { if(isAudioOn && BGM.paused) BGM.play().catch(()=>{}); }
 
+        // --- MULTI-STEP ENGINE ---
+        function changeStep(stepNum, stepTitle) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('step' + stepNum).classList.add('active');
+            document.getElementById('stepTitle').innerText = stepTitle;
+            
+            // สั่งจุดไฟหลอดความคืบหน้าด้านบน
+            for (let i = 1; i <= 3; i++) {
+                if(i <= stepNum) {
+                    document.getElementById('dot' + i).classList.add('filled');
+                } else {
+                    document.getElementById('dot' + i).classList.remove('filled');
+                }
+            }
+        }
+
+        // สุ่มโจทย์เลขด่านแรก
+        let num1 = Math.floor(Math.random() * 10) + 5;
+        let num2 = Math.floor(Math.random() * 10) + 3;
+        let captchaResult = num1 + num2;
+        document.getElementById('captchaQuestion').innerText = `${num1} + ${num2} = ?`;
+
+        function verifyStep1() {
+            playClickSound();
+            const ans = parseInt(document.getElementById('captchaAnswer').value);
+            if(ans === captchaResult) {
+                addLog("IDENTITY CONFIRMED. SECURITY BYPASS GRANTED.");
+                changeStep(2, "PHASE 02: SYNCHRONIZING SECURE TUNNEL");
+                startCooldown();
+            } else {
+                Swal.fire({icon: 'error', title: 'ACCESS DENIED', text: 'Cognitive code validation failed.', background: '#020604', color: '#00ff66', confirmButtonColor: '#00ff66'});
+                addLog("CRITICAL: INVALID COGNITIVE ENTRY DETECTED.");
+            }
+        }
+
+        function startCooldown() {
+            let sec = 10; // ตั้งเวลาข้ามด่านที่นี่ (วินาที)
+            const txt = document.getElementById('cooldownSeconds');
+            const btn = document.getElementById('step2Btn');
+            
+            const timer = setInterval(() => {
+                sec--;
+                txt.innerText = sec.toString().padStart(2, '0');
+                if(sec <= 0) {
+                    clearInterval(timer);
+                    txt.innerText = "OK";
+                    btn.disabled = false;
+                    btn.innerText = "ACCESS MAIN HUB";
+                    addLog("TUNNEL STABILIZED. FIREWALL OVERRIDDEN.");
+                }
+            }, 1000);
+        }
+
+        function goToStep3() {
+            playClickSound();
+            changeStep(3, "FINAL PHASE: DATABASE ACCESS NODE");
+            addLog("CONNECTED TO FIREBASE SYSTEM SECURELY.");
+        }
+
+        // --- CORE PROCESS (โค้ดดั้งเดิมของคุณที่มีการปรับข้อความและปุ่มให้หรูขึ้น) ---
         function hackerEffect(targetText) {
             let i = 0;
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$";
             const display = document.getElementById('keyText');
             const inter = setInterval(() => {
                 display.innerText = targetText.split("").map((c, idx) => 
@@ -330,7 +468,7 @@
 
         async function processKey() {
             if(Date.now() - lastGenTime < 5000) {
-                Swal.fire({icon: 'warning', title: 'ANTI-SPAM', text: 'Please wait 5 seconds.', background: '#000', color: '#0f0'});
+                Swal.fire({icon: 'warning', title: 'ANTI-SPAM ACTIVE', text: 'Security cooldown in progress. Wait 5s.', background: '#020604', color: '#00ff66'});
                 return;
             }
             lastGenTime = Date.now();
@@ -338,24 +476,22 @@
             const btn = document.getElementById('genBtn');
             const fill = document.getElementById('pFill');
             
-            if(isAudioOn) { SFX.currentTime = 0; SFX.play(); }
+            playClickSound();
             
             btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
+            btn.innerText = "INJECTING ACCESS PACKETS...";
             
-            // Animation Progress
             let p = 0;
             const pInterval = setInterval(() => {
-                p += Math.random() * 5;
+                p += Math.random() * 6;
                 if(p > 100) p = 100;
                 fill.style.width = p + "%";
             }, 50);
 
-            addLog("REQUESTING ACCESS...");
-            addLog("BYPASSING FIREWALL...");
+            addLog("UPLINK OPENED. INJECTING TO DATABASE...");
             
-            const newKey = "CREATOR-" + Math.random().toString(36).substr(2, 6).toUpperCase() + "-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-            const expTime = Date.now() + (24 * 60 * 60 * 1000); // 24 Hours
+            const newKey = "CREATOR-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+            const expTime = Date.now() + (24 * 60 * 60 * 1000); 
 
             try {
                 await db.ref('keys/' + newKey).set({
@@ -370,25 +506,24 @@
                     fill.style.width = "100%";
                     hackerEffect(newKey);
                     startCountdown(expTime);
-                    document.getElementById('keyLabel').innerText = "SYSTEM ACCESS GRANTED:";
-                    btn.innerText = "KEY GENERATED";
-                    addLog("DATABASE INJECTED SUCCESSFULLY.");
-                    addLog("ACCESS KEY: " + newKey);
+                    document.getElementById('keyLabel').innerText = "DECRYPTED SECURITY TOKEN:";
+                    btn.innerText = "ACCESS GRANTED";
+                    addLog("SUCCESS: TOKEN GENERATED AND SIGNED.");
                     
                     Swal.fire({
-                        title: 'ACCESS GRANTED',
-                        text: 'Your key has been registered for 24 hours.',
+                        title: 'ACCESS INJECTED',
+                        text: 'Token successfully registered for 24 hours.',
                         icon: 'success',
-                        background: '#001500',
-                        color: '#0f0',
-                        confirmButtonColor: '#0f0'
+                        background: '#041208',
+                        color: '#00ff66',
+                        confirmButtonColor: '#00ff66'
                     });
                 }, 1500);
 
             } catch (e) {
-                addLog("ERROR: " + e.message);
+                addLog("CRITICAL ERROR: " + e.message);
                 btn.disabled = false;
-                btn.innerText = "RETRY GENERATE";
+                btn.innerText = "RE-ATTACK INJECTION";
             }
         }
 
@@ -396,10 +531,10 @@
             const keyText = document.getElementById('keyText').innerText;
             if(keyText.includes("XXXXX")) return;
             navigator.clipboard.writeText(keyText);
-            Swal.fire({toast: true, position: 'top-end', title: 'COPIED!', showConfirmButton: false, timer: 1500, background: '#000', color: '#0f0'});
+            Swal.fire({toast: true, position: 'top-end', title: 'TOKEN COPIED!', showConfirmButton: false, timer: 1500, background: '#020604', color: '#00ff66'});
         }
 
-        // Realtime stats
+        // Realtime ดึงข้อมูลจำนวนผู้ใช้เดิม
         db.ref('stats').on('value', s => {
             document.getElementById('userCount').innerText = s.val() || 0;
         });
