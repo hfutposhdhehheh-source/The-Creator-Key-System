@@ -42,13 +42,11 @@
             padding: 20px;
         }
 
-        /* เมนการ์ดทรง Sci-Fi ตัดมุมล้ำๆ (Cyber Panel) */
         .card {
             background: rgba(4, 14, 8, 0.85);
             border: 1px solid rgba(0, 255, 102, 0.4);
             padding: 40px 30px;
             border-radius: 4px;
-            /* ตัดมุมซ้ายบนและขวาล่างให้เป็นเหลี่ยมเหล็กยานอวกาศ */
             clip-path: polygon(40px 0%, 100% 0%, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0% 100%, 0% 40px);
             box-shadow: 0 0 40px rgba(0, 255, 102, 0.15), inset 0 0 25px rgba(0, 255, 102, 0.05);
             backdrop-filter: blur(25px);
@@ -56,7 +54,6 @@
             position: relative;
         }
 
-        /* เส้นนีออนประดับมุมกล่องเพิ่มความแพง */
         .card::before {
             content: '';
             position: absolute;
@@ -82,7 +79,6 @@
             display: block;
         }
 
-        /* แถบบอกความคืบหน้าของด่าน (Step Track Lines) */
         .step-track {
             display: flex;
             justify-content: space-between;
@@ -146,7 +142,6 @@
             border-left: 3px solid #00ff66;
         }
 
-        /* วงแหวนเรดาร์เรืองแสงด่าน 2 */
         .radar-container {
             position: relative;
             width: 130px; height: 130px;
@@ -178,7 +173,6 @@
         @keyframes rotateRadar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes rotateRadarReverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-        /* กล่องโชว์คีย์แบบ Hologram */
         .key-display-box {
             background: rgba(0, 255, 102, 0.02);
             border: 1px solid rgba(0, 255, 102, 0.3);
@@ -204,7 +198,6 @@
         .progress-bar-container { height: 4px; background: rgba(0, 40, 15, 0.6); border-radius: 2px; margin-bottom: 25px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00ff66, #fff); box-shadow: 0 0 8px #00ff66; }
 
-        /* ปุ่มแนว Sci-Fi สุดเดือด */
         .btn-gen {
             width: 100%; padding: 16px;
             background: transparent;
@@ -223,7 +216,6 @@
         }
         .btn-gen:disabled { background: rgba(0, 30, 10, 0.3); border-color: rgba(0, 255, 102, 0.1); color: #004411; cursor: not-allowed; box-shadow: none; }
 
-        /* ส่วนล่าง หน้าต่างล็อก และ สแตท */
         .logs-window {
             height: 75px; background: rgba(0, 4, 2, 0.8);
             border: 1px solid rgba(0, 255, 102, 0.15);
@@ -365,7 +357,7 @@
         function toggleAudio() {
             isAudioOn = !isAudioOn;
             document.querySelector('.sound-control').innerText = `🔊 AUDIO SYSTEM: ${isAudioOn ? 'ACTIVE' : 'MUTED'}`;
-            if(isAudioOn) BGM.play(); else BGM.pause();
+            if(isAudioOn) BGM.play().catch(()=>{}); else BGM.pause();
         }
 
         function playClickSound() {
@@ -380,7 +372,6 @@
             document.getElementById('step' + stepNum).classList.add('active');
             document.getElementById('stepTitle').innerText = stepTitle;
             
-            // สั่งจุดไฟหลอดความคืบหน้าด้านบน
             for (let i = 1; i <= 3; i++) {
                 if(i <= stepNum) {
                     document.getElementById('dot' + i).classList.add('filled');
@@ -390,7 +381,6 @@
             }
         }
 
-        // สุ่มโจทย์เลขด่านแรก
         let num1 = Math.floor(Math.random() * 10) + 5;
         let num2 = Math.floor(Math.random() * 10) + 3;
         let captchaResult = num1 + num2;
@@ -410,7 +400,7 @@
         }
 
         function startCooldown() {
-            let sec = 20; // ตั้งเวลาข้ามด่านที่นี่ (วินาที)
+            let sec = 20; 
             const txt = document.getElementById('cooldownSeconds');
             const btn = document.getElementById('step2Btn');
             
@@ -433,7 +423,6 @@
             addLog("CONNECTED TO FIREBASE SYSTEM SECURELY.");
         }
 
-        // --- CORE PROCESS (โค้ดดั้งเดิมของคุณที่มีการปรับข้อความและปุ่มให้หรูขึ้น) ---
         function hackerEffect(targetText) {
             let i = 0;
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$";
@@ -490,7 +479,8 @@
 
             addLog("UPLINK OPENED. INJECTING TO DATABASE...");
             
-            const newKey = "CREATOR-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+            // 🔥 FIXED: แก้ไขจาก .substr เป็น .substring เพื่อไม่ให้ฟังก์ชันแครช
+            const newKey = "CREATOR-" + Math.random().toString(36).substring(2, 8).toUpperCase();
             const expTime = Date.now() + (24 * 60 * 60 * 1000); 
 
             try {
@@ -499,7 +489,8 @@
                     status: "active",
                     createdAt: new Date().toISOString()
                 });
-                db.ref('stats').transaction(v => (v || 0) + 1);
+                
+                await db.ref('stats').transaction(v => (v || 0) + 1);
 
                 setTimeout(() => {
                     clearInterval(pInterval);
@@ -521,9 +512,12 @@
                 }, 1500);
 
             } catch (e) {
+                clearInterval(pInterval);
+                fill.style.width = "0%";
                 addLog("CRITICAL ERROR: " + e.message);
                 btn.disabled = false;
                 btn.innerText = "RE-ATTACK INJECTION";
+                Swal.fire({icon: 'error', title: 'DATABASE ERROR', text: e.message, background: '#020604', color: '#00ff66'});
             }
         }
 
@@ -534,7 +528,6 @@
             Swal.fire({toast: true, position: 'top-end', title: 'TOKEN COPIED!', showConfirmButton: false, timer: 1500, background: '#020604', color: '#00ff66'});
         }
 
-        // Realtime ดึงข้อมูลจำนวนผู้ใช้เดิม
         db.ref('stats').on('value', s => {
             document.getElementById('userCount').innerText = s.val() || 0;
         });
